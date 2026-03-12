@@ -7,6 +7,7 @@ import {
   getAlerts,
   getDevices,
 } from '../data/mockReadings'
+import { useEffect, useState } from "react";
 import DashboardCard from '../components/DashboardCard'
 import TemperatureHumidityChart from '../components/charts/TemperatureHumidityChart'
 import SoilMoistureChart from '../components/charts/SoilMoistureChart'
@@ -14,9 +15,7 @@ import LightChart from '../components/charts/LightChart'
 import Co2Chart from '../components/charts/Co2Chart'
 import AlertList from '../components/AlertList'
 import DeviceStatus from '../components/DeviceStatus'
-
-const r = getCurrentReadings()
-const tempHum24 = getTemperatureHumidity24h()
+import { SENSOR_WS_URL } from "../api/socketConfig";
 const soil24 = getSoilMoisture24h()
 const light24 = getLight24h()
 const co224 = getCo224h()
@@ -24,6 +23,72 @@ const alerts = getAlerts()
 const devices = getDevices()
 
 export default function Dashboard() {
+  const [tempHum24, setTempHum24] = useState([]);
+  // const [soil24, setSoil24] = useState([]);
+  // const [light24, setLight24] = useState([]);
+  // const [co224, setCo224] = useState([]);
+  // const [alerts, setAlerts] = useState([]);
+  // const [devices, setDevices] = useState([]);
+
+  const [r, setReadings] = useState({
+    device_id: "",
+    temperature: 0,
+    humidity: 0,
+    heatIndex: 0,
+    heatIndexStatus: "normal",
+    soilMoisture: 0,
+    pumpStatus: "unknown",
+    pumpDurationMinutes: 0,
+    timestamp: "",
+  });
+
+  useEffect(() => {
+    const socket = new WebSocket(SENSOR_WS_URL);
+
+    socket.onopen = () => {
+      console.log("Connected to sensor WebSocket");
+    };
+
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log("Live sensor data:", data);
+
+      const temperature = Number(data.temperature);
+      const humidity = Number(data.humidity);
+      const heatIndex = (temperature + humidity * 0.05).toFixed(1);
+
+      setReadings((prev) => ({
+        ...prev,
+        device_id: data.device_id,
+        temperature,
+        humidity,
+        timestamp: data.timestamp,
+        heatIndex,
+        heatIndexStatus: Number(heatIndex) >= 35 ? "warning" : "normal",
+      }));
+      setTempHum24((prev) => [
+        ...prev.slice(-23),
+        {
+          time: new Date().toLocaleTimeString(),
+          temperature,
+          humidity,
+        },
+      ]);
+    };
+
+    socket.onerror = (err) => {
+      console.error("WebSocket error:", err);
+    };
+
+    socket.onclose = () => {
+      console.log("Sensor WebSocket disconnected");
+    };
+
+    return () => {
+      socket.close();
+    };
+  }, []);
+
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold text-white sr-only">Dashboard</h2>
@@ -50,7 +115,7 @@ export default function Dashboard() {
           <p className="text-2xl font-bold text-white">{r.soilMoisture}%</p>
           <div className="mt-1">
             <span className="text-green-400 text-sm font-medium">
-              Pump Status: {r.pumpStatus.toUpperCase()} ({r.pumpDurationMinutes}m)
+              Pump Status:  {(r.pumpStatus ?? "unknown").toUpperCase()} ({r.pumpDurationMinutes}m)
             </span>
           </div>
           <p className="text-slate-500 text-xs mt-2">Soil Moisture Level (Last 24 Hours)</p>
