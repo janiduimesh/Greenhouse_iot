@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard'
 import History from './pages/History'
 import Settings from './pages/Settings'
 import Reports from './pages/Reports'
+import Forecast from './pages/Forecast'
 
 function App() {
   return (
@@ -15,14 +16,16 @@ function App() {
           <Route path="/history" element={<History />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/reports" element={<Reports />} />
+          <Route path='/forecast' element={<Forecast/>}/>
         </Routes>
       </main>
       <nav className="fixed bottom-0 left-0 right-0 bg-slate-800 border-t border-slate-700 flex justify-center gap-0 safe-area-pb">
         {[
           { to: '/', label: 'Dashboard' },
-          { to: '/history', label: 'History' },
+          { to: '/history', label: 'Alerts' },
           { to: '/settings', label: 'Settings' },
           { to: '/reports', label: 'Reports' },
+          { to: '/forecast', label: 'Forecast' },
         ].map(({ to, label }) => (
           <NavLink
             key={to}

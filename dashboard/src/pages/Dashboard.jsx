@@ -93,7 +93,7 @@ export default function Dashboard() {
     <div className="space-y-4">
       <h2 className="text-xl font-semibold text-white sr-only">Dashboard</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <DashboardCard title="Temperature & Humidity">
           <p className="text-2xl font-bold text-white">
             {r.temperature}°C <span className="text-slate-400 font-normal text-lg">/ {r.humidity}%</span>
@@ -144,7 +144,7 @@ export default function Dashboard() {
         </DashboardCard>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <DashboardCard
           title="Alerts"
           icon={<span className="text-red-500" aria-hidden><AlertPanelIcon /></span>}
@@ -157,7 +157,7 @@ export default function Dashboard() {
         >
           <DeviceStatus devices={devices} />
         </DashboardCard>
-      </div>
+      </div> */}
     </div>
   )
 }
