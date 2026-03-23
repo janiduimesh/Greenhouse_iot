@@ -16,16 +16,14 @@ import Co2Chart from '../components/charts/Co2Chart'
 import AlertList from '../components/AlertList'
 import DeviceStatus from '../components/DeviceStatus'
 import { SENSOR_WS_URL } from "../api/socketConfig";
-const soil24 = getSoilMoisture24h()
-const light24 = getLight24h()
 const co224 = getCo224h()
 const alerts = getAlerts()
 const devices = getDevices()
 
 export default function Dashboard() {
   const [tempHum24, setTempHum24] = useState([]);
-  // const [soil24, setSoil24] = useState([]);
-  // const [light24, setLight24] = useState([]);
+  const [soil24, setSoil24] = useState([]);
+  const [light24, setLight24] = useState([]);
   // const [co224, setCo224] = useState([]);
   // const [alerts, setAlerts] = useState([]);
   // const [devices, setDevices] = useState([]);
@@ -37,6 +35,7 @@ export default function Dashboard() {
     heatIndex: 0,
     heatIndexStatus: "normal",
     soilMoisture: 0,
+    soilStatus: "",
     pumpStatus: "unknown",
     pumpDurationMinutes: 0,
     timestamp: "",
@@ -62,9 +61,11 @@ export default function Dashboard() {
         device_id: data.device_id,
         temperature,
         humidity,
-        timestamp: data.timestamp,
         heatIndex,
         heatIndexStatus: Number(heatIndex) >= 35 ? "warning" : "normal",
+        soilMoisture: Number(data.soil_moisture_percentage),
+        lightLevel: Math.round(((4095 - Number(data.light_value)) / 4095) * 100),
+        lightStatus: data.light_status,  
       }));
       setTempHum24((prev) => [
         ...prev.slice(-23),
@@ -72,6 +73,20 @@ export default function Dashboard() {
           time: new Date().toLocaleTimeString(),
           temperature,
           humidity,
+        },
+      ]);
+      setSoil24((prev) => [
+        ...prev.slice(-23),
+        {
+          label: new Date().toLocaleTimeString(),  
+          moisture: Number(data.soil_moisture_percentage),  
+        },
+      ]);
+      setLight24((prev) => [
+        ...prev.slice(-23),
+        {
+          label: new Date().toLocaleTimeString(),
+          light: Math.round(((4095 - Number(data.light_value)) / 4095) * 100),
         },
       ]);
     };
@@ -114,8 +129,11 @@ export default function Dashboard() {
         <DashboardCard title="Soil Moisture & Irrigation">
           <p className="text-2xl font-bold text-white">{r.soilMoisture}%</p>
           <div className="mt-1">
-            <span className="text-green-400 text-sm font-medium">
-              Pump Status:  {(r.pumpStatus ?? "unknown").toUpperCase()} ({r.pumpDurationMinutes}m)
+            <span className={`text-sm font-medium ${r.pumpStatus === "on" ? "text-green-400" : "text-slate-400"}`}>
+              Pump: {(r.pumpStatus ?? "unknown").toUpperCase()}
+            </span>
+            <span className="text-slate-400 text-sm ml-2">
+              Soil: {r.soilStatus}
             </span>
           </div>
           <p className="text-slate-500 text-xs mt-2">Soil Moisture Level (Last 24 Hours)</p>
@@ -123,10 +141,12 @@ export default function Dashboard() {
         </DashboardCard>
 
         <DashboardCard title="Light Intensity">
-          <p className="text-2xl font-bold text-white">{r.lightLevel} lx</p>
-          <div className="mt-1">
-            <span className="text-slate-400 text-sm">Photoperiod: </span>
-            <span className="text-white">{r.photoperiodHours} hrs</span>
+          <p className="text-2xl font-bold text-white">{r.lightLevel}%</p>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="text-slate-400 text-sm">Status:</span>
+            <span className={`text-sm font-medium ${r.lightStatus === "ON" ? "text-yellow-400" : "text-slate-400"}`}>
+              {r.lightStatus}
+            </span>
           </div>
           <p className="text-slate-500 text-xs mt-2">Light Intensity (Last 24 Hours)</p>
           <LightChart data={light24} />

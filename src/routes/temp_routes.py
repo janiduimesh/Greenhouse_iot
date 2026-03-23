@@ -1,21 +1,15 @@
-from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
-import requests
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 import logging
-import os
 from datetime import datetime, timedelta
-
-from schema.temp import SensorData
-from utils.database import get_database
 from typing import List
 import asyncio
+
+from schema.temp import SensorData, SensorPredictionResponse, SensorForecastPoint
+from utils.database import get_database
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
-# # Get ESP32 IP from environment variable or use default
-# ESP32_IP = os.getenv("ESP32_IP", "192.168.43.168")
-# ESP32_URL = f"http://{ESP32_IP}/distance"
-# REQUEST_TIMEOUT = int(os.getenv("ESP32_TIMEOUT", "5"))  
 
 class ConnectionManager:
     def __init__(self):
@@ -31,7 +25,7 @@ class ConnectionManager:
 
     async def broadcast(self, message: dict):
         dead = []
-        for connection in self.active_connections:
+        for connection in list(self.active_connections):
             try:
                 await connection.send_json(message)
             except Exception:
@@ -40,41 +34,62 @@ class ConnectionManager:
         for connection in dead:
             self.disconnect(connection)
 
-manager = ConnectionManager()
 
+manager = ConnectionManager()
 
 @router.post("/sensor-data")
 async def receive_sensor_data(data: SensorData):
-    """Receive sensor readings from ESP32 and persist every 15 minutes per device."""
+    """Receive merged greenhouse sensor data from ESP32 and store every 1 minute."""
     payload = data.model_dump()
-    print("Incoming data:", payload)
-
-    await manager.broadcast(payload)
+    logger.info("Incoming data: %s", payload)
 
     db = get_database()
-    readings = db["sensor_readings"]
+    latest = db["latest_sensor_readings"]
 
     now = datetime.utcnow()
 
-    last = await readings.find_one(
-        {"device_id": data.device_id},
-        sort=[("created_at", -1)],
-    )
+    # Broadcast live payload to WebSocket clients
+    await manager.broadcast({
+        **payload,
+        "timestamp": now.isoformat()
+    })
+
+    last = await latest.find_one({"device_id": data.device_id})
+
+    doc = {
+        "device_id": data.device_id,
+        "temperature": data.temperature,
+        "humidity": data.humidity,
+        "soil_moisture_value": data.soil_moisture_value,
+        "soil_moisture_percentage": data.soil_moisture_percentage,
+        "soil_status": data.soil_status,
+        "light_value": data.light_value,
+        "light_status": data.light_status,
+        "co2_value": data.co2_value,
+        "co2_status": data.co2_status,
+        "servo_status": data.servo_status,
+        "pump_status": data.pump_status,
+        "fan_status": data.fan_status,
+        "buzzer_status": data.buzzer_status,
+        "timestamp": now,
+        "created_at": now,
+    }
 
     if last is None or now - last["created_at"] >= timedelta(minutes=1):
-        doc = {
-            "device_id": data.device_id,
-            "temperature": data.temperature,
-            "humidity": data.humidity,
-            "timestamp": now,  
-            "created_at": now,            
-        }
-        await readings.insert_one(doc)
-        logger.info("Stored sensor reading in MongoDB for device %s", data.device_id)
+        await latest.update_one(
+            {"device_id": data.device_id},
+            {"$set": {**doc, "updated_at": now}},
+            upsert=True
+        )
+        logger.info("Stored sensor reading for device %s", data.device_id)
     else:
-        logger.info("Skipped storing reading for %s (within 15 min window)", data.device_id)
+        logger.info("Skipped storing reading for %s (within 1 min gap)", data.device_id)
 
-    return {"status": "success"}
+    return {
+        "status": "success",
+        "device_id": data.device_id,
+        "data": payload
+    }
 
 @router.websocket("/ws/sensor-data")
 async def websocket_endpoint(websocket: WebSocket):
@@ -85,4 +100,4 @@ async def websocket_endpoint(websocket: WebSocket):
     except WebSocketDisconnect:
         manager.disconnect(websocket)
     except Exception:
-        manager.disconnect(websocket) 
+        manager.disconnect(websocket)
