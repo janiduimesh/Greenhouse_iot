@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException, Query
-from datetime import datetime, timezone
 import logging
-
 from schema.temp import SensorPredictionResponse
 from jobs.predict_sensor_model import predict_sensor_forecast
 from utils.database import get_database
+from datetime import datetime, timedelta, timezone
+from fastapi import Query, HTTPException
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -69,3 +69,62 @@ async def predict_sensors(
     except Exception as e:
         logger.error("Prediction error: %s", str(e), exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
+
+
+VALID_SENSORS = ["light_value", "co2_value", "soil_moisture_percentage", "temperature", "humidity"]
+
+@router.get("/sensor-data/history")
+async def get_sensor_history(
+    device_id: str = Query(...),
+    sensor_type: str = Query(...),
+    days: int = Query(...)
+):
+    if device_id not in GREENHOUSE_DEVICE_IDS:
+        raise HTTPException(status_code=400, detail="Invalid device_id")
+
+    if sensor_type not in VALID_SENSORS:
+        raise HTTPException(status_code=400, detail=f"Invalid sensor_type: {VALID_SENSORS}")
+
+    if days not in [7, 14]:
+        raise HTTPException(status_code=400, detail="Days must be 7 or 14")
+
+    try:
+        db = get_database()
+        collection = db["latest_sensor_readings"]
+
+        # Time filter
+        start_date = datetime.now(timezone.utc) - timedelta(days=days)
+
+        cursor = collection.find(
+            {
+                "device_id": device_id,
+                "timestamp": {"$gte": start_date}
+            },
+            {
+                "_id": 0,
+                "timestamp": 1,
+                sensor_type: 1
+            }
+        ).sort("timestamp", 1)
+
+        data = await cursor.to_list(length=10000)
+
+        # Format response for frontend
+        formatted = [
+            {
+                "timestamp": d["timestamp"],
+                "value": d.get(sensor_type)
+            }
+            for d in data
+        ]
+
+        return {
+            "success": True,
+            "sensor": sensor_type,
+            "days": days,
+            "count": len(formatted),
+            "data": formatted
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))        

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { BASE_URL } from "../api/socketConfig"; // adjust to your config
+
 
 const SENSORS = [
   { key: "light", label: "Light Sensor", icon: "💡" },
@@ -12,53 +14,86 @@ const PERIODS = [
   { label: "Last 14 days", value: 14 },
 ];
 
-function downloadCSV(sensorKey, days) {
-  const headers = ["timestamp", "value", "unit"];
-  const rows = [];
-  const now = new Date();
-  for (let i = days * 24; i >= 0; i--) {
-    const ts = new Date(now.getTime() - i * 60 * 60 * 1000);
-    let value, unit;
-    if (sensorKey === "light") { value = (Math.random() * 500 + 100).toFixed(1); unit = "lx"; }
-    else if (sensorKey === "co2") { value = (Math.random() * 300 + 350).toFixed(0); unit = "ppm"; }
-    else if (sensorKey === "moisture") { value = (Math.random() * 60 + 20).toFixed(1); unit = "%"; }
-    else { value = (Math.random() * 15 + 20).toFixed(1); unit = "°C"; }
-    rows.push([ts.toISOString(), value, unit].join(","));
+const SENSOR_API_MAP = {
+  light: "light_value",
+  co2: "co2_value",
+  moisture: "soil_moisture_percentage",
+  temperature: "temperature",
+  humidity: "humidity",
+};
+
+async function downloadCSV(sensorKey, days) {
+  try {
+    const res = await fetch(
+      `${BASE_URL}/api/v1/sensor-data/history?device_id=greenhouse_node_1&sensor_type=${SENSOR_API_MAP[sensorKey]}&days=${days}`
+    );
+
+    const result = await res.json();
+
+    if (!result.success) {
+      alert(result.message || "Failed to fetch data");
+      return;
+    }
+
+    const headers = ["timestamp", "value"];
+    const rows = result.data.map((row) =>
+      [row.timestamp, row.value].join(",")
+    );
+
+    const csv = [headers.join(","), ...rows].join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${sensorKey}_sensor_last_${days}_days.csv`;
+    a.click();
+
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    console.error(err);
+    alert("Error downloading data");
   }
-  const csv = [headers.join(","), ...rows].join("\n");
-  const blob = new Blob([csv], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${sensorKey}_sensor_last_${days}_days.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
 }
 
-function downloadCombinedCSV(selectedKeys) {
-  const headers = ["timestamp", "sensor", "value", "unit"];
-  const rows = [];
-  const now = new Date();
-  const days = 14;
-  for (let i = days * 24; i >= 0; i -= 6) {
-    const ts = new Date(now.getTime() - i * 60 * 60 * 1000);
-    selectedKeys.forEach((key) => {
-      let value, unit;
-      if (key === "light") { value = (Math.random() * 500 + 100).toFixed(1); unit = "lx"; }
-      else if (key === "co2") { value = (Math.random() * 300 + 350).toFixed(0); unit = "ppm"; }
-      else if (key === "moisture") { value = (Math.random() * 60 + 20).toFixed(1); unit = "%"; }
-      else { value = (Math.random() * 15 + 20).toFixed(1); unit = "°C"; }
-      rows.push([ts.toISOString(), key, value, unit].join(","));
-    });
+async function downloadCombinedCSV(selectedKeys) {
+  try {
+    const headers = ["timestamp", "sensor", "value"];
+    let allRows = [];
+
+    for (const key of selectedKeys) {
+      const apiSensor = SENSOR_API_MAP[key];
+      const res = await fetch(
+        `${BASE_URL}/api/v1/sensor-data/history?device_id=greenhouse_node_1&sensor_type=${apiSensor}&days=14`
+      );
+
+      const result = await res.json();
+
+      if (result.success) {
+        const rows = result.data.map((row) =>
+          [row.timestamp, key, row.value].join(",")
+        );
+
+        allRows = [...allRows, ...rows];
+      }
+    }
+
+    const csv = [headers.join(","), ...allRows].join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `combined_sensor_report.csv`;
+    a.click();
+
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    console.error(err);
+    alert("Error generating combined report");
   }
-  const csv = [headers.join(","), ...rows].join("\n");
-  const blob = new Blob([csv], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `combined_sensor_report.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
 }
 
 function SensorCard({ sensor }) {

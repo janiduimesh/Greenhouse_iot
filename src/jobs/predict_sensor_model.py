@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
+from utils.database import get_database
 
 import joblib
 import numpy as np
@@ -48,15 +49,6 @@ RESAMPLE_FREQ = "1h"
 FORECAST_HOURS = 6
 
 
-from motor.motor_asyncio import AsyncIOMotorClient
-
-MONGO_URL = "mongodb+srv://username:eArQY7si0RszsSJf@cluster0.jwxhy.mongodb.net/?appName=Cluster0"
-DB_NAME = "Greenhouse"
-
-def get_mongo_db():
-    client = AsyncIOMotorClient(MONGO_URL)
-    db = client[DB_NAME]
-    return client, db
 
 # =========================================================
 # MODEL LOADING
@@ -89,7 +81,7 @@ async def fetch_recent_data(device_id: str, lookback_hours: int = 48) -> List[di
     """
     
     # db = get_database()
-    client, db = get_mongo_db()
+    db = get_database()
     cutoff = datetime.now(timezone.utc) - timedelta(hours=lookback_hours)
 
     cursor = db["latest_sensor_readings"].find(
@@ -101,7 +93,6 @@ async def fetch_recent_data(device_id: str, lookback_hours: int = 48) -> List[di
 
     data = await cursor.to_list(length=None)
     logger.info("[Data] Fetched %s recent rows for device=%s", len(data), device_id)
-    client.close()
     return data
 
 
