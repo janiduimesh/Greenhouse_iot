@@ -16,7 +16,6 @@ import Co2Chart from '../components/charts/Co2Chart'
 import AlertList from '../components/AlertList'
 import DeviceStatus from '../components/DeviceStatus'
 import { SENSOR_WS_URL } from "../api/socketConfig";
-const co224 = getCo224h()
 const alerts = getAlerts()
 const devices = getDevices()
 
@@ -24,7 +23,7 @@ export default function Dashboard() {
   const [tempHum24, setTempHum24] = useState([]);
   const [soil24, setSoil24] = useState([]);
   const [light24, setLight24] = useState([]);
-  // const [co224, setCo224] = useState([]);
+  const [co224, setCo224] = useState([]);
   // const [alerts, setAlerts] = useState([]);
   // const [devices, setDevices] = useState([]);
 
@@ -66,6 +65,7 @@ export default function Dashboard() {
         soilMoisture: Number(data.soil_moisture_percentage),
         lightLevel: Math.round(((4095 - Number(data.light_value)) / 4095) * 100),
         lightStatus: data.light_status,  
+        co2Level:Number(data.co2_value)
       }));
       setTempHum24((prev) => [
         ...prev.slice(-23),
@@ -87,6 +87,13 @@ export default function Dashboard() {
         {
           label: new Date().toLocaleTimeString(),
           light: Math.round(((4095 - Number(data.light_value)) / 4095) * 100),
+        },
+      ]);
+      setCo224((prev) => [
+        ...prev.slice(-23),
+        {
+          label: new Date().toLocaleTimeString(),
+          light: Number(data.co2Level),
         },
       ]);
     };
