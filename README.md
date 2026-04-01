@@ -47,7 +47,7 @@ A greenhouse IoT project with a **FastAPI** backend and a **React** monitoring d
 
 4. **Run the API** (from project root)
    ```bash
-   python -m uvicorn src.app:app --host 0.0.0.0 --port 8002 --reload
+   python -m uvicorn app:app --host 0.0.0.0 --port 8002 --reload
    ```
    - API: http://localhost:8002  
    - Docs: http://localhost:8002/docs  

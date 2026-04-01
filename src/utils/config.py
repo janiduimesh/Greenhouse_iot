@@ -13,6 +13,9 @@ class Settings(BaseSettings):
 
     mongodb_url: str
     mongodb_db_name: str
+
+    jwt_secret_key: str = "greenhouse-iot-secret-change-me"
+    jwt_expiry_minutes: int = 1440  # 24 hours
         
     class Config:
         env_file = str(ROOT_DIR / ".env")  
