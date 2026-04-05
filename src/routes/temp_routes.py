@@ -1,11 +1,12 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List
 import asyncio
 
 from schema.temp import SensorData, SensorPredictionResponse, SensorForecastPoint
 from utils.database import get_database
+from routes.alert_routes import check_thresholds, store_alerts
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -46,13 +47,30 @@ async def receive_sensor_data(data: SensorData):
     db = get_database()
     latest = db["latest_sensor_readings"]
 
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
 
-    # Broadcast live payload to WebSocket clients
-    await manager.broadcast({
+    # Check sensor thresholds and generate alerts
+    alerts = check_thresholds({**payload, "device_id": data.device_id})
+    stored_alerts = await store_alerts(alerts)
+
+    # Broadcast live payload + any new alerts to WebSocket clients
+    broadcast_data = {
         **payload,
-        "timestamp": now.isoformat()
-    })
+        "timestamp": now.isoformat(),
+    }
+    if stored_alerts:
+        broadcast_data["alerts"] = [
+            {
+                "sensor": a["sensor"],
+                "value": a["value"],
+                "severity": a["severity"],
+                "message": a["message"],
+                "icon": a["icon"],
+                "timestamp": a["timestamp"].isoformat(),
+            }
+            for a in stored_alerts
+        ]
+    await manager.broadcast(broadcast_data)
 
     last = await latest.find_one({"device_id": data.device_id})
 
@@ -75,7 +93,17 @@ async def receive_sensor_data(data: SensorData):
         "created_at": now,
     }
 
-    if last is None or now - last["created_at"] >= timedelta(minutes=1):
+    last = await latest.find_one({"device_id": data.device_id})
+
+    last_time = None
+    if last:
+        last_time = last.get("created_at")
+
+        if last_time and last_time.tzinfo is None:
+            last_time = last_time.replace(tzinfo=timezone.utc)
+
+
+    if last_time is None or now - last_time >= timedelta(minutes=1):
         await latest.update_one(
             {"device_id": data.device_id},
             {"$set": {**doc, "updated_at": now}},

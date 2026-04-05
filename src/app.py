@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 import uvicorn
 import logging
 from dotenv import load_dotenv
-from routes import temp_routes, forcast_routes, auth_routes
+from routes import temp_routes, forcast_routes, auth_routes, alert_routes, device_routes
 from utils.database import connect_to_mongo, close_mongo_connection
 
 load_dotenv()
@@ -44,6 +44,8 @@ app.add_middleware(
 app.include_router(temp_routes.router, prefix="/api/v1", tags=["temp"])
 app.include_router(forcast_routes.router, prefix="/api/v1", tags=["forcast"])
 app.include_router(auth_routes.router, prefix="/api/v1", tags=["auth"])
+app.include_router(alert_routes.router, prefix="/api/v1", tags=["alerts"])
+app.include_router(device_routes.router, prefix="/api/v1", tags=["device"])
 # app.include_router(temp_routes.router, tags=["temp-compat"])
 
 @app.get("/")
