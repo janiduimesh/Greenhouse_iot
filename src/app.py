@@ -4,21 +4,38 @@ from contextlib import asynccontextmanager
 import uvicorn
 import logging
 from dotenv import load_dotenv
-from routes import temp_routes, forcast_routes, auth_routes, alert_routes, device_routes
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from routes import temp_routes, forcast_routes, auth_routes, alert_routes, device_routes, chat_routes
 from utils.database import connect_to_mongo, close_mongo_connection
+from jobs.data_snapshot_job import update_sensor_snapshot
 
 load_dotenv()
 logger = logging.getLogger(__name__)
 
+scheduler = AsyncIOScheduler()
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Startup and shutdown logic (e.g. DB pool, caches)."""
+    """Startup and shutdown logic (e.g. DB pool, caches, scheduler)."""
     logger.info("Starting up")
     await connect_to_mongo()
+
+    await update_sensor_snapshot()
+    scheduler.add_job(
+        update_sensor_snapshot,
+        trigger="interval",
+        hours=1,
+        id="sensor_snapshot",
+        replace_existing=True,
+    )
+    scheduler.start()
+    logger.info(" Scheduler started — sensor snapshot will refresh every hour.")
+
     try:
         yield
     finally:
+        scheduler.shutdown(wait=False)
         await close_mongo_connection()
         logger.info("Shutting down")
 
@@ -46,7 +63,7 @@ app.include_router(forcast_routes.router, prefix="/api/v1", tags=["forcast"])
 app.include_router(auth_routes.router, prefix="/api/v1", tags=["auth"])
 app.include_router(alert_routes.router, prefix="/api/v1", tags=["alerts"])
 app.include_router(device_routes.router, prefix="/api/v1", tags=["device"])
-# app.include_router(temp_routes.router, tags=["temp-compat"])
+app.include_router(chat_routes.router, prefix="/api/v1", tags=["chat"])
 
 @app.get("/")
 async def root():

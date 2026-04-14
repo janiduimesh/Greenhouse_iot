@@ -2,6 +2,7 @@ import { Routes, Route, NavLink, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Header from './components/Header'
+import ChatBot from './components/ChatBot'
 import Dashboard from './pages/Dashboard'
 import History from './pages/History'
 import Settings from './pages/Settings'
@@ -96,6 +97,9 @@ function AppContent() {
           </NavLink>
         ))}
       </nav>
+
+      {/* AI Chatbot — floating bubble, visible on all pages */}
+      <ChatBot />
     </div>
   )
 }

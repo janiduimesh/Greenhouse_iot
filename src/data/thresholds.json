@@ -1,0 +1,37 @@
+{
+  "temperature": {
+    "unit": "°C",
+    "description": "Air temperature inside the greenhouse",
+    "critical_high": 35,
+    "warning_high": 30,
+    "warning_low": 10,
+    "safe_range": "10–30 °C"
+  },
+  "humidity": {
+    "unit": "%",
+    "description": "Relative air humidity",
+    "warning_high": 90,
+    "warning_low": 30,
+    "safe_range": "30–90 %"
+  },
+  "soil_moisture_percentage": {
+    "unit": "%",
+    "description": "Soil moisture level measured by capacitive sensor",
+    "critical_low": 15,
+    "warning_low": 25,
+    "safe_range": "25–100 %"
+  },
+  "co2_value": {
+    "unit": "ppm",
+    "description": "Carbon dioxide concentration inside greenhouse",
+    "critical_high": 1000,
+    "warning_high": 700,
+    "safe_range": "0–700 ppm"
+  },
+  "light_value": {
+    "unit": "raw (0–1023)",
+    "description": "Light intensity measured by LDR sensor",
+    "warning_low": 200,
+    "safe_range": "200–1023"
+  }
+}

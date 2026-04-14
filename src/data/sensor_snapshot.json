@@ -1,0 +1,27 @@
+{
+  "generated_at": "2026-04-14T18:46:50.047583+00:00",
+  "latest_reading": {
+    "device_id": "greenhouse_node_1",
+    "buzzer_status": "OFF",
+    "co2_status": "RISK",
+    "co2_value": 2112,
+    "created_at": "2026-04-04T06:59:45.145000",
+    "fan_status": "ON",
+    "humidity": 46.0,
+    "light_status": "ON",
+    "light_value": 2384,
+    "pump_status": "ON",
+    "servo_status": "CLOSED",
+    "soil_moisture_percentage": 0,
+    "soil_moisture_value": 4095,
+    "soil_status": "DRY",
+    "temperature": 25.3,
+    "timestamp": "2026-04-04T06:59:45.145000",
+    "updated_at": "2026-04-04T06:59:45.145000"
+  },
+  "alerts_last_24h": [],
+  "alert_summary": {
+    "critical": 0,
+    "warning": 0
+  }
+}

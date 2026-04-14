@@ -16,6 +16,10 @@ class Settings(BaseSettings):
 
     jwt_secret_key: str = "greenhouse-iot-secret-change-me"
     jwt_expiry_minutes: int = 1440  # 24 hours
+
+    gemini_api_key: Optional[str] = None
+
+    groq_api_key: Optional[str] = None
         
     class Config:
         env_file = str(ROOT_DIR / ".env")  
