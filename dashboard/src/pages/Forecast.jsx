@@ -16,6 +16,7 @@ function transformForecast(forecast) {
   return forecast.map((item, i) => ({
     time: HOUR_LABELS[i] ?? `+${i}h`,
     temperature: item.temperature,
+    humidity: item.humidity,
     moisture: item.soil_moisture_percentage,
     light: toLightBrightness(item.light_value),
     co2: item.co2_value,
@@ -24,12 +25,17 @@ function transformForecast(forecast) {
 
 function getBarColor(value, type) {
   if (type === "temperature") {
-    if (value >= 32) return "#ef4444";
-    if (value >= 30) return "#f59e0b";
+    if (value >= 30) return "#ef4444";
+    if (value >= 28) return "#f59e0b";
     return "#60a5fa";
   }
   if (type === "moisture") {
     if (value <= 20) return "#ef4444";
+    if (value <= 30) return "#f59e0b";
+    return "#22c55e";
+  }
+  if (type === "humidity") {
+    if (value >= 70) return "#ef4444";
     if (value <= 30) return "#f59e0b";
     return "#22c55e";
   }
@@ -39,7 +45,7 @@ function getBarColor(value, type) {
   }
   if (type === "co2") {
     if (value >= 1000) return "#ef4444";
-    if (value >= 700)  return "#f59e0b";
+    if (value >= 700) return "#f59e0b";
     return "#22c55e";
   }
   return "#60a5fa";
@@ -47,9 +53,10 @@ function getBarColor(value, type) {
 
 function formatValue(value, type) {
   if (type === "temperature") return `${value}°`;
-  if (type === "moisture")    return `${value}%`;
-  if (type === "light")       return `${value}%`;
-  if (type === "co2")         return `${value}`;
+  if (type === "humidity") return `${value}%`;
+  if (type === "moisture") return `${value}%`;
+  if (type === "light") return `${value}%`;
+  if (type === "co2") return `${value}`;
   return value;
 }
 
@@ -58,8 +65,8 @@ function formatValue(value, type) {
 function getTempMeta(data) {
   const peak = Math.max(...data.map((d) => d.temperature));
   const peakIdx = data.findIndex((d) => d.temperature === peak);
-  if (peak >= 32) return {
-    badge: { text: `⚠ Will exceed 32°C at ${HOUR_LABELS[peakIdx]}`, variant: "warning" },
+  if (peak >= 30) return {
+    badge: { text: `⚠ Will exceed 30°C at ${HOUR_LABELS[peakIdx]}`, variant: "warning" },
     alert: { text: `Action: Consider activating ventilation fans around ${HOUR_LABELS[peakIdx]} to prevent heat stress.`, variant: "danger" },
   };
   return {
@@ -82,6 +89,25 @@ function getMoistureMeta(data) {
   return {
     badge: { text: "✓ Moisture stable", variant: "success" },
     alert: { text: "Soil moisture remains within healthy range for the next 6 hours.", variant: "success" },
+  };
+}
+
+function getHumidityMeta(data) {
+  const peak = Math.max(...data.map((d) => d.humidity));
+  const peakIdx = data.findIndex((d) => d.humidity === peak);
+  if (peak >= 70) return {
+    badge: { text: `● High humidity at ${HOUR_LABELS[peakIdx]}`, variant: "danger" },
+    alert: { text: `Humidity may reach ${peak}%. Consider activating fans.`, variant: "danger" },
+  };
+  const min = Math.min(...data.map((d) => d.humidity));
+  const minIdx = data.findIndex((d) => d.humidity === min);
+  if (min <= 30) return {
+    badge: { text: `⚠ Low humidity at ${HOUR_LABELS[minIdx]}`, variant: "warning" },
+    alert: { text: `Humidity might drop to ${min}%. Consider misting.`, variant: "warning" },
+  };
+  return {
+    badge: { text: "✓ Humidity normal", variant: "success" },
+    alert: { text: "Humidity remains within optimal range.", variant: "success" },
   };
 }
 
@@ -123,7 +149,7 @@ function BarRow({ data, type, maxValue }) {
         return (
           <div key={i} className="flex flex-col items-center gap-1 flex-1">
             <span className="text-slate-400 text-xs">{d.time}</span>
-            <div className="w-full rounded bg-slate-700/60" style={{ height: 80 }}>
+            <div className="w-2/3 rounded bg-slate-700/60" style={{ height: 80 }}>
               <div
                 className="w-full rounded transition-all"
                 style={{ height: `${heightPct}%`, background: color, marginTop: `${100 - heightPct}%` }}
@@ -143,7 +169,7 @@ function ForecastAreaChart({ data, color, gradientId, yDomain }) {
       <AreaChart data={data} margin={{ top: 8, right: 4, left: -20, bottom: 0 }}>
         <defs>
           <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%"  stopColor={color} stopOpacity={0.5} />
+            <stop offset="5%" stopColor={color} stopOpacity={0.5} />
             <stop offset="95%" stopColor={color} stopOpacity={0.05} />
           </linearGradient>
         </defs>
@@ -163,8 +189,8 @@ function ForecastAreaChart({ data, color, gradientId, yDomain }) {
 function StatusBadge({ text, variant }) {
   const styles = {
     warning: { bg: "rgba(245,158,11,0.15)", border: "rgba(245,158,11,0.4)", text: "#f59e0b", dot: "#f59e0b" },
-    danger:  { bg: "rgba(239,68,68,0.15)",  border: "rgba(239,68,68,0.4)",  text: "#ef4444", dot: "#ef4444" },
-    success: { bg: "rgba(34,197,94,0.15)",  border: "rgba(34,197,94,0.4)",  text: "#22c55e", dot: "#22c55e" },
+    danger: { bg: "rgba(239,68,68,0.15)", border: "rgba(239,68,68,0.4)", text: "#ef4444", dot: "#ef4444" },
+    success: { bg: "rgba(34,197,94,0.15)", border: "rgba(34,197,94,0.4)", text: "#22c55e", dot: "#22c55e" },
   };
   const s = styles[variant] || styles.warning;
   return (
@@ -178,8 +204,8 @@ function StatusBadge({ text, variant }) {
 
 function AlertBar({ text, variant }) {
   const styles = {
-    danger:  { bg: "rgba(239,68,68,0.12)",  border: "rgba(239,68,68,0.3)",  dot: "#ef4444", text: "#fca5a5" },
-    success: { bg: "rgba(34,197,94,0.10)",  border: "rgba(34,197,94,0.3)",  dot: "#22c55e", text: "#86efac" },
+    danger: { bg: "rgba(239,68,68,0.12)", border: "rgba(239,68,68,0.3)", dot: "#ef4444", text: "#fca5a5" },
+    success: { bg: "rgba(34,197,94,0.10)", border: "rgba(34,197,94,0.3)", dot: "#22c55e", text: "#86efac" },
   };
   const s = styles[variant] || styles.danger;
   return (
@@ -233,8 +259,8 @@ function ErrorState({ message, onRetry }) {
 
 export default function Forecast() {
   const [forecast, setForecast] = useState(null);
-  const [loading, setLoading]   = useState(true);
-  const [error, setError]       = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [generatedAt, setGeneratedAt] = useState(null);
 
   const fetchForecast = async () => {
@@ -255,18 +281,20 @@ export default function Forecast() {
 
   useEffect(() => { fetchForecast(); }, []);
 
-  const tempData  = useMemo(() => forecast?.map((d) => ({ time: d.time, value: d.temperature })) ?? [], [forecast]);
-  const moistData = useMemo(() => forecast?.map((d) => ({ time: d.time, value: d.moisture }))    ?? [], [forecast]);
-  const lightData = useMemo(() => forecast?.map((d) => ({ time: d.time, value: d.light }))        ?? [], [forecast]);
-  const co2Data   = useMemo(() => forecast?.map((d) => ({ time: d.time, value: d.co2 }))          ?? [], [forecast]);
+  const tempData = useMemo(() => forecast?.map((d) => ({ time: d.time, value: d.temperature })) ?? [], [forecast]);
+  const humidData = useMemo(() => forecast?.map((d) => ({ time: d.time, value: d.humidity })) ?? [], [forecast]);
+  const moistData = useMemo(() => forecast?.map((d) => ({ time: d.time, value: d.moisture })) ?? [], [forecast]);
+  const lightData = useMemo(() => forecast?.map((d) => ({ time: d.time, value: d.light })) ?? [], [forecast]);
+  const co2Data = useMemo(() => forecast?.map((d) => ({ time: d.time, value: d.co2 })) ?? [], [forecast]);
 
-  const tempMeta  = useMemo(() => forecast ? getTempMeta(forecast)     : null, [forecast]);
+  const tempMeta = useMemo(() => forecast ? getTempMeta(forecast) : null, [forecast]);
+  const humidMeta = useMemo(() => forecast ? getHumidityMeta(forecast) : null, [forecast]);
   const moistMeta = useMemo(() => forecast ? getMoistureMeta(forecast) : null, [forecast]);
-  const lightMeta = useMemo(() => forecast ? getLightMeta(forecast)    : null, [forecast]);
-  const co2Meta   = useMemo(() => forecast ? getCo2Meta(forecast)      : null, [forecast]);
+  const lightMeta = useMemo(() => forecast ? getLightMeta(forecast) : null, [forecast]);
+  const co2Meta = useMemo(() => forecast ? getCo2Meta(forecast) : null, [forecast]);
 
   if (loading) return <LoadingState />;
-  if (error)   return <ErrorState message={error} onRetry={fetchForecast} />;
+  if (error) return <ErrorState message={error} onRetry={fetchForecast} />;
 
   return (
     <div className="space-y-4">
@@ -284,6 +312,15 @@ export default function Forecast() {
           barData={tempData} areaData={tempData} areaColor="#60a5fa"
           gradientId="tempGrad" yDomain={[25, 38]} maxBarValue={38}
           alertText={tempMeta.alert.text} alertVariant={tempMeta.alert.variant}
+        />
+
+        <ForecastCard
+          title="Humidity Forecast" icon="☁️" iconColor="#7dd3fc"
+          type="humidity"
+          badge={humidMeta.badge}
+          barData={humidData} areaData={humidData} areaColor="#7dd3fc"
+          gradientId="humidGrad" yDomain={[0, 100]} maxBarValue={100}
+          alertText={humidMeta.alert.text} alertVariant={humidMeta.alert.variant}
         />
 
         <ForecastCard
