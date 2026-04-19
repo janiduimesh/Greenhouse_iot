@@ -25,7 +25,7 @@ async def lifespan(app: FastAPI):
     scheduler.add_job(
         update_sensor_snapshot,
         trigger="interval",
-        hours=1,
+        minutes=5,          
         id="sensor_snapshot",
         replace_existing=True,
     )
