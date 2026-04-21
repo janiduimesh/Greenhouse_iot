@@ -93,7 +93,7 @@ export default function Dashboard() {
         ...prev.slice(-23),
         {
           label: new Date().toLocaleTimeString(),
-          light: Number(data.co2Level),
+          co2: Number(data.co2_value),
         },
       ]);
     };

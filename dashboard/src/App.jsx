@@ -6,7 +6,7 @@ import ChatBot from './components/ChatBot'
 import Dashboard from './pages/Dashboard'
 import History from './pages/History'
 import Settings from './pages/Settings'
-import Reports from './pages/Reports'
+import Analytics from './pages/Analytics'
 import Forecast from './pages/Forecast'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -29,7 +29,7 @@ function AppContent() {
     { to: '/forecast', label: 'Forecast' },
     { to: '/history', label: 'Alerts' },
     ...(isAdmin() ? [
-      { to: '/reports', label: 'Reports' },
+      { to: '/analytics', label: 'Analytics' },
       { to: '/settings', label: 'Settings' },
       { to: '/register', label: 'Users' },
     ] : []),
@@ -68,8 +68,8 @@ function AppContent() {
           <Route path="/settings" element={
             <ProtectedRoute requiredRole="admin"><Settings /></ProtectedRoute>
           } />
-          <Route path="/reports" element={
-            <ProtectedRoute requiredRole="admin"><Reports /></ProtectedRoute>
+          <Route path="/analytics" element={
+            <ProtectedRoute requiredRole="admin"><Analytics /></ProtectedRoute>
           } />
           <Route path="/register" element={
             <ProtectedRoute requiredRole="admin"><Register /></ProtectedRoute>
