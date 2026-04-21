@@ -49,11 +49,9 @@ async def receive_sensor_data(data: SensorData):
 
     now = datetime.now(timezone.utc)
 
-    # Check sensor thresholds and generate alerts
     alerts = check_thresholds({**payload, "device_id": data.device_id})
     stored_alerts = await store_alerts(alerts)
 
-    # Broadcast live payload + any new alerts to WebSocket clients
     broadcast_data = {
         **payload,
         "timestamp": now.isoformat(),

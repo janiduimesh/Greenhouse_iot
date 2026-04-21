@@ -5,7 +5,7 @@ import uvicorn
 import logging
 from dotenv import load_dotenv
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from routes import temp_routes, forcast_routes, auth_routes, alert_routes, device_routes, chat_routes
+from routes import temp_routes, forcast_routes, auth_routes, alert_routes, device_routes, analytics_routes, chat_routes
 from utils.database import connect_to_mongo, close_mongo_connection
 from jobs.data_snapshot_job import update_sensor_snapshot
 
@@ -63,6 +63,7 @@ app.include_router(forcast_routes.router, prefix="/api/v1", tags=["forcast"])
 app.include_router(auth_routes.router, prefix="/api/v1", tags=["auth"])
 app.include_router(alert_routes.router, prefix="/api/v1", tags=["alerts"])
 app.include_router(device_routes.router, prefix="/api/v1", tags=["device"])
+app.include_router(analytics_routes.router, prefix="/api/v1", tags=["analytics"])
 app.include_router(chat_routes.router, prefix="/api/v1", tags=["chat"])
 
 @app.get("/")
