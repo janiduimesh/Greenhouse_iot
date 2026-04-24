@@ -7,6 +7,7 @@ import {
   getAlerts,
   getDevices,
 } from '../data/mockReadings'
+import { useEffect, useState } from "react";
 import DashboardCard from '../components/DashboardCard'
 import TemperatureHumidityChart from '../components/charts/TemperatureHumidityChart'
 import SoilMoistureChart from '../components/charts/SoilMoistureChart'
@@ -14,21 +15,107 @@ import LightChart from '../components/charts/LightChart'
 import Co2Chart from '../components/charts/Co2Chart'
 import AlertList from '../components/AlertList'
 import DeviceStatus from '../components/DeviceStatus'
-
-const r = getCurrentReadings()
-const tempHum24 = getTemperatureHumidity24h()
-const soil24 = getSoilMoisture24h()
-const light24 = getLight24h()
-const co224 = getCo224h()
+import { SENSOR_WS_URL } from "../api/socketConfig";
 const alerts = getAlerts()
 const devices = getDevices()
 
 export default function Dashboard() {
+  const [tempHum24, setTempHum24] = useState([]);
+  const [soil24, setSoil24] = useState([]);
+  const [light24, setLight24] = useState([]);
+  const [co224, setCo224] = useState([]);
+  // const [alerts, setAlerts] = useState([]);
+  // const [devices, setDevices] = useState([]);
+
+  const [r, setReadings] = useState({
+    device_id: "",
+    temperature: 0,
+    humidity: 0,
+    heatIndex: 0,
+    heatIndexStatus: "normal",
+    soilMoisture: 0,
+    soilStatus: "",
+    pumpStatus: "unknown",
+    pumpDurationMinutes: 0,
+    timestamp: "",
+  });
+
+  useEffect(() => {
+    const socket = new WebSocket(SENSOR_WS_URL);
+
+    socket.onopen = () => {
+      console.log("Connected to sensor WebSocket");
+    };
+
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log("Live sensor data:", data);
+
+      const temperature = Number(data.temperature);
+      const humidity = Number(data.humidity);
+      const heatIndex = (temperature + humidity * 0.05).toFixed(1);
+
+      setReadings((prev) => ({
+        ...prev,
+        device_id: data.device_id,
+        temperature,
+        humidity,
+        heatIndex,
+        heatIndexStatus: Number(heatIndex) >= 35 ? "warning" : "normal",
+        soilMoisture: Number(data.soil_moisture_percentage),
+        lightLevel: Math.round(((4095 - Number(data.light_value)) / 4095) * 100),
+        lightStatus: data.light_status,  
+        co2Level:Number(data.co2_value)
+      }));
+      setTempHum24((prev) => [
+        ...prev.slice(-23),
+        {
+          time: new Date().toLocaleTimeString(),
+          temperature,
+          humidity,
+        },
+      ]);
+      setSoil24((prev) => [
+        ...prev.slice(-23),
+        {
+          label: new Date().toLocaleTimeString(),  
+          moisture: Number(data.soil_moisture_percentage),  
+        },
+      ]);
+      setLight24((prev) => [
+        ...prev.slice(-23),
+        {
+          label: new Date().toLocaleTimeString(),
+          light: Math.round(((4095 - Number(data.light_value)) / 4095) * 100),
+        },
+      ]);
+      setCo224((prev) => [
+        ...prev.slice(-23),
+        {
+          label: new Date().toLocaleTimeString(),
+          co2: Number(data.co2_value),
+        },
+      ]);
+    };
+
+    socket.onerror = (err) => {
+      console.error("WebSocket error:", err);
+    };
+
+    socket.onclose = () => {
+      console.log("Sensor WebSocket disconnected");
+    };
+
+    return () => {
+      socket.close();
+    };
+  }, []);
+
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold text-white sr-only">Dashboard</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <DashboardCard title="Temperature & Humidity">
           <p className="text-2xl font-bold text-white">
             {r.temperature}°C <span className="text-slate-400 font-normal text-lg">/ {r.humidity}%</span>
@@ -49,8 +136,11 @@ export default function Dashboard() {
         <DashboardCard title="Soil Moisture & Irrigation">
           <p className="text-2xl font-bold text-white">{r.soilMoisture}%</p>
           <div className="mt-1">
-            <span className="text-green-400 text-sm font-medium">
-              Pump Status: {r.pumpStatus.toUpperCase()} ({r.pumpDurationMinutes}m)
+            <span className={`text-sm font-medium ${r.pumpStatus === "on" ? "text-green-400" : "text-slate-400"}`}>
+              Pump: {(r.pumpStatus ?? "unknown").toUpperCase()}
+            </span>
+            <span className="text-slate-400 text-sm ml-2">
+              Soil: {r.soilStatus}
             </span>
           </div>
           <p className="text-slate-500 text-xs mt-2">Soil Moisture Level (Last 24 Hours)</p>
@@ -58,10 +148,12 @@ export default function Dashboard() {
         </DashboardCard>
 
         <DashboardCard title="Light Intensity">
-          <p className="text-2xl font-bold text-white">{r.lightLevel} lx</p>
-          <div className="mt-1">
-            <span className="text-slate-400 text-sm">Photoperiod: </span>
-            <span className="text-white">{r.photoperiodHours} hrs</span>
+          <p className="text-2xl font-bold text-white">{r.lightLevel}%</p>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="text-slate-400 text-sm">Status:</span>
+            <span className={`text-sm font-medium ${r.lightStatus === "ON" ? "text-yellow-400" : "text-slate-400"}`}>
+              {r.lightStatus}
+            </span>
           </div>
           <p className="text-slate-500 text-xs mt-2">Light Intensity (Last 24 Hours)</p>
           <LightChart data={light24} />
@@ -79,7 +171,7 @@ export default function Dashboard() {
         </DashboardCard>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <DashboardCard
           title="Alerts"
           icon={<span className="text-red-500" aria-hidden><AlertPanelIcon /></span>}
@@ -92,7 +184,7 @@ export default function Dashboard() {
         >
           <DeviceStatus devices={devices} />
         </DashboardCard>
-      </div>
+      </div> */}
     </div>
   )
 }
