@@ -31,7 +31,7 @@ function VisualizationsTab({ data, loading }) {
     if (!data || !data.length) return [];
 
     let map = {};
-    
+
     const getGroupKey = (dateObj) => {
       if (aggregation === "monthly") {
         return `${dateObj.getFullYear()}-${(dateObj.getMonth() + 1).toString().padStart(2, '0')}`;
@@ -50,7 +50,7 @@ function VisualizationsTab({ data, loading }) {
     data.forEach((d) => {
       const dateObj = new Date(d.timestamp);
       const key = getGroupKey(dateObj);
-      
+
       if (!map[key]) {
         map[key] = {
           formattedTime: key,
@@ -62,7 +62,7 @@ function VisualizationsTab({ data, loading }) {
           co2: 0,
         };
       }
-      
+
       const entry = map[key];
       entry.count++;
       entry.temperature += (d.temperature || 0);
@@ -97,9 +97,9 @@ function VisualizationsTab({ data, loading }) {
           <div className="flex items-center justify-between">
             <h3 className="text-white font-semibold flex items-center gap-3">
               Climate Correlation
-              <select 
-                value={aggregation} 
-                onChange={(e) => setAggregation(e.target.value)} 
+              <select
+                value={aggregation}
+                onChange={(e) => setAggregation(e.target.value)}
                 className="bg-slate-700 border border-slate-600 text-[11px] px-2 py-0.5 rounded text-slate-200 outline-none cursor-pointer"
               >
                 <option value="monthly">Monthly</option>
@@ -113,7 +113,7 @@ function VisualizationsTab({ data, loading }) {
             Comparing Temperature vs Humidity over time (Dual Y-Axis). Use the brush slider below to zoom.
           </p>
         </div>
-        
+
         <div className="h-80 w-full mb-8">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
@@ -126,7 +126,7 @@ function VisualizationsTab({ data, loading }) {
                 labelStyle={{ color: "#94a3b8", marginBottom: 4 }}
               />
               <Legend verticalAlign="top" height={36} iconType="circle" wrapperStyle={{ fontSize: 12 }} />
-              
+
               <Line yAxisId="left" type="monotone" dataKey="temperature" name="Temperature" stroke="#f472b6" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
               <Line yAxisId="right" type="monotone" dataKey="humidity" name="Humidity" stroke="#38bdf8" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
 
@@ -140,7 +140,7 @@ function VisualizationsTab({ data, loading }) {
           </ResponsiveContainer>
         </div>
       </div>
-      
+
       <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
         <div className="mb-4">
           <h3 className="text-white font-semibold">Growth Metrics</h3>
@@ -182,7 +182,7 @@ async function downloadCSV(sensorDbKey, days, filenameSuffix) {
     const headers = ["timestamp", "value"];
     const rows = result.data.map(row => [row.timestamp, row.value].join(","));
     const csv = [headers.join(","), ...rows].join("\n");
-    
+
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -211,7 +211,7 @@ function TableExportTab({ data, loading }) {
 
   return (
     <div className="space-y-6">
-      
+
       {/* EXPORT CARDS (Migrated from Reports) */}
       <h3 className="text-white font-semibold mb-2">CSV Exports</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -286,7 +286,7 @@ function MapTab() {
   useEffect(() => {
     // A quick effect that randomly pulses the water tank to show it works
     const i = setInterval(() => {
-      setLive(prev => ({...prev, temp: Math.random() > 0.8 ? 'warning' : 'ok'}))
+      setLive(prev => ({ ...prev, temp: Math.random() > 0.8 ? 'warning' : 'ok' }))
     }, 5000);
     return () => clearInterval(i);
   }, []);
@@ -304,27 +304,27 @@ function MapTab() {
       <div className="bg-slate-800 border border-slate-700 rounded-xl p-5 block">
         <h3 className="text-white font-semibold mb-1">Greenhouse Layout</h3>
         <p className="text-xs text-slate-400 mb-6">Live spatial overview of sensor zones. Dots pulse based on real-time alerts.</p>
-        
+
         {/* Render a fake map via CSS Grid / Absolute positioning */}
         <div className="relative w-full max-w-2xl mx-auto aspect-video bg-slate-900 border-2 border-slate-700/80 rounded-2xl p-4 overflow-hidden shadow-inset-lg">
-          
+
           {/* Background layout details */}
           <div className="absolute inset-x-8 inset-y-8 border border-dashed border-slate-600 rounded bg-slate-800/30 flex items-center justify-center">
             <span className="text-slate-600 text-2xl font-bold tracking-[0.5em] opacity-20 transform -rotate-12">CANOPY BED</span>
           </div>
-          
+
           <div className="absolute inset-y-12 left-12 w-24 border border-x-indigo-500/30 border-y-0 flex flex-col items-center justify-around"></div>
-          
+
           <div className="absolute bottom-4 right-4 w-20 h-20 rounded-full border-4 border-slate-700 flex items-center justify-center bg-slate-800/80 shadow-inner">
-             <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest text-center mt-3">Tank</span>
+            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest text-center mt-3">Tank</span>
           </div>
 
           <div className="absolute top-4 right-8 w-32 h-10 border-2 border-slate-600 rounded flex items-center justify-center bg-slate-800/50">
-             <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Vent HVAC</span>
+            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Vent HVAC</span>
           </div>
 
           <div className="absolute bottom-4 left-6 w-12 h-1 border-b-4 border-amber-600/50 rounded flex items-center justify-center">
-             <span className="text-[8px] text-slate-500 mt-4 capitalize">Door</span>
+            <span className="text-[8px] text-slate-500 mt-4 capitalize">Door</span>
           </div>
 
           {/* Interactive Nodes */}
@@ -346,8 +346,8 @@ function MapTab() {
             <span className="px-2 py-0.5 bg-slate-900/90 border border-red-900 text-[9px] text-red-200 rounded font-mono shadow-xl relative top-2">PUMP MALFUNCTION</span>
           </div>
 
-           {/* Node 4: Light/CO2 near Vent */}
-           <div className="absolute top-10 right-20 flex flex-col items-center group cursor-pointer">
+          {/* Node 4: Light/CO2 near Vent */}
+          <div className="absolute top-10 right-20 flex flex-col items-center group cursor-pointer">
             <div className={`w-3 h-3 rounded-full mb-1 transition-colors duration-500 ${getDotStyle(live.light)}`} />
             <span className="px-2 py-0.5 bg-slate-900/80 border border-slate-800 text-[9px] text-white rounded font-mono group-hover:scale-110 transition-transform">Vent Node</span>
           </div>
@@ -389,19 +389,19 @@ export default function Analytics() {
       </div>
 
       <div className="flex gap-2 bg-slate-800/50 p-1 rounded-xl w-max border border-slate-700/50 mb-2">
-        <button 
+        <button
           onClick={() => setActiveTab("viz")}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === "viz" ? "bg-slate-700 text-sky-400" : "text-slate-400 hover:text-slate-200"}`}
         >
           📈 Visualizations
         </button>
-        <button 
+        <button
           onClick={() => setActiveTab("table")}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === "table" ? "bg-slate-700 text-sky-400" : "text-slate-400 hover:text-slate-200"}`}
         >
           📋 Table & Export
         </button>
-        <button 
+        <button
           onClick={() => setActiveTab("map")}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === "map" ? "bg-slate-700 text-sky-400" : "text-slate-400 hover:text-slate-200"}`}
         >
