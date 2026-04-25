@@ -8,6 +8,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from routes import temp_routes, forcast_routes, auth_routes, alert_routes, device_routes, analytics_routes, chat_routes
 from utils.database import connect_to_mongo, close_mongo_connection
 from jobs.data_snapshot_job import update_sensor_snapshot
+from jobs.train_sensor_model import main as retrain_sensor_models
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -29,8 +30,19 @@ async def lifespan(app: FastAPI):
         id="sensor_snapshot",
         replace_existing=True,
     )
+
+    # ── Sensor model retraining — runs daily at 2:00 AM UTC ──
+    scheduler.add_job(
+        retrain_sensor_models,
+        trigger="cron",
+        hour=2,
+        minute=0,
+        id="sensor_model_retrain",
+        replace_existing=True,
+    )
+
     scheduler.start()
-    logger.info(" Scheduler started — sensor snapshot will refresh every hour.")
+    logger.info(" Scheduler started — snapshot every 5 min, model retrain daily at 02:00 UTC.")
 
     try:
         yield
