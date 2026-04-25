@@ -23,7 +23,7 @@ ALERT_THRESHOLDS = {
         "warning_low":  {"value": 25, "message": "Soil moisture low", "icon": "🪴"},
     },
     "co2_value": {
-        "critical_high": {"value": 1000, "message": "CO₂ critically high — open vents", "icon": "💨"},
+        "critical_high": {"value": 1000, "message": "CO₂ critically high", "icon": "💨"},
         "warning_high":  {"value": 700,  "message": "CO₂ elevated", "icon": "💨"},
     },
     "light_value": {
