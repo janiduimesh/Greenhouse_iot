@@ -63,9 +63,11 @@ export default function Dashboard() {
         heatIndex,
         heatIndexStatus: Number(heatIndex) >= 35 ? "warning" : "normal",
         soilMoisture: Number(data.soil_moisture_percentage),
+        soilStatus: data.soil_status,
+        pumpStatus: data.pump_status,
         lightLevel: Math.round(((4095 - Number(data.light_value)) / 4095) * 100),
-        lightStatus: data.light_status,  
-        co2Level:Number(data.co2_value)
+        lightStatus: data.light_status,
+        co2Level: Number(data.co2_value)
       }));
       setTempHum24((prev) => [
         ...prev.slice(-23),
@@ -78,8 +80,8 @@ export default function Dashboard() {
       setSoil24((prev) => [
         ...prev.slice(-23),
         {
-          label: new Date().toLocaleTimeString(),  
-          moisture: Number(data.soil_moisture_percentage),  
+          label: new Date().toLocaleTimeString(),
+          moisture: Number(data.soil_moisture_percentage),
         },
       ]);
       setLight24((prev) => [
@@ -160,7 +162,7 @@ export default function Dashboard() {
         </DashboardCard>
 
         <DashboardCard title="CO₂ & Air Quality">
-          <p className="text-2xl font-bold text-white">{r.co2Level} ppm</p>
+          <p className="text-2xl font-bold text-white">{r.co2Level} </p>
           <div className="mt-1">
             {r.co2Status === 'critical' && (
               <span className="text-red-400 font-medium text-sm">High CO₂ Alert!</span>

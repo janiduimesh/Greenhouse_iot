@@ -15,7 +15,7 @@ ALERT_THRESHOLDS = {
         "warning_low":   {"value": 10, "message": "Temperature below safe range", "icon": "🌡️"},
     },
     "humidity": {
-        "warning_high": {"value": 90, "message": "Humidity very high", "icon": "💧"},
+        "warning_high": {"value": 70, "message": "Humidity very high", "icon": "💧"},
         "warning_low":  {"value": 30, "message": "Humidity too low", "icon": "💧"},
     },
     "soil_moisture_percentage": {
@@ -147,7 +147,7 @@ async def get_alerts(
                 "message": a["message"],
                 "icon": a.get("icon", "⚠"),
                 "device_id": a["device_id"],
-                "timestamp": a["timestamp"].isoformat(),
+                "timestamp": a["timestamp"].replace(tzinfo=timezone.utc).isoformat(),
             }
             for a in alerts
         ],

@@ -112,7 +112,7 @@ async def get_sensor_history(
         # Format response for frontend
         formatted = [
             {
-                "timestamp": d["timestamp"],
+                "timestamp": d["timestamp"].replace(tzinfo=timezone.utc),
                 "value": d.get(sensor_type)
             }
             for d in data
