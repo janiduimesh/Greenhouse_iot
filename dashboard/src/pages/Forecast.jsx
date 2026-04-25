@@ -6,7 +6,7 @@ import { BASE_URL } from "../api/socketConfig"; // adjust to your config
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-const HOUR_LABELS = ["Now", "+1h", "+2h", "+3h", "+4h", "+5h", "+6h"];
+const HOUR_LABELS = ["+1h", "+2h", "+3h", "+4h", "+5h", "+6h"];
 
 function toLightBrightness(raw) {
   return Math.round(((4095 - raw) / 4095) * 100);

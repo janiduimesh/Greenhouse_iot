@@ -158,8 +158,8 @@ function FilterTabs({ filter, setFilter, counts }) {
           key={tab.key}
           onClick={() => setFilter(tab.key)}
           className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${filter === tab.key
-              ? "bg-slate-700 text-white"
-              : "text-slate-500 hover:text-slate-300"
+            ? "bg-slate-700 text-white"
+            : "text-slate-500 hover:text-slate-300"
             }`}
         >
           {tab.label}
@@ -277,8 +277,12 @@ export default function History() {
     return () => socket.close();
   }, []);
 
-  // Merge live + historical, dedupe, sort
-  const allAlerts = [...liveAlerts, ...alerts].sort(
+  // Merge live + historical, filter live by selected window, sort
+  const cutoff = Date.now() - hours * 60 * 60 * 1000;
+  const filteredLive = liveAlerts.filter(
+    (a) => new Date(a.timestamp).getTime() >= cutoff
+  );
+  const allAlerts = [...filteredLive, ...alerts].sort(
     (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
   );
 
