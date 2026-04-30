@@ -1,33 +1,78 @@
 {
-  "generated_at": "2026-04-25T11:55:40.202093+00:00",
+  "generated_at": "2026-04-26T04:29:23.577576+00:00",
   "latest_reading": {
     "device_id": "greenhouse_node_1",
-    "buzzer_status": "ON",
-    "co2_status": "RISK",
-    "co2_value": 1795,
-    "created_at": "2026-04-25T11:30:49.836000",
-    "fan_status": "ON",
-    "humidity": 67.0,
+    "buzzer_status": "OFF",
+    "co2_status": "SAFE",
+    "co2_value": 1134,
+    "created_at": "2026-04-25T13:03:03.819000",
+    "fan_status": "OFF",
+    "humidity": 45.0,
     "light_status": "OFF",
-    "light_value": 396,
+    "light_value": 318,
     "pump_status": "ON",
-    "servo_status": "OPEN",
-    "soil_moisture_percentage": 10,
-    "soil_moisture_value": 3811,
+    "servo_status": "CLOSED",
+    "soil_moisture_percentage": 9,
+    "soil_moisture_value": 3851,
     "soil_status": "DRY",
-    "temperature": 31.8,
-    "timestamp": "2026-04-25T11:30:49.836000",
-    "updated_at": "2026-04-25T11:30:49.836000"
+    "temperature": 24.1,
+    "timestamp": "2026-04-25T13:03:03.819000",
+    "updated_at": "2026-04-25T13:03:03.819000"
   },
   "alerts_last_24h": [
     {
-      "sensor": "co2_value",
-      "value": 1274.0,
+      "sensor": "soil_moisture_percentage",
+      "value": 9.0,
       "severity": "critical",
-      "message": "CO\u2082 critically high \u2014 open vents",
+      "message": "Soil critically dry \u2014 irrigation needed",
+      "icon": "\ud83e\udeb4",
+      "device_id": "greenhouse_node_1",
+      "timestamp": "2026-04-25T13:02:48.419000"
+    },
+    {
+      "sensor": "co2_value",
+      "value": 1671.0,
+      "severity": "critical",
+      "message": "CO\u2082 critically high",
       "icon": "\ud83d\udca8",
       "device_id": "greenhouse_node_1",
-      "timestamp": "2026-04-25T11:29:44.706000"
+      "timestamp": "2026-04-25T13:01:58.280000"
+    },
+    {
+      "sensor": "soil_moisture_percentage",
+      "value": 4.0,
+      "severity": "critical",
+      "message": "Soil critically dry \u2014 irrigation needed",
+      "icon": "\ud83e\udeb4",
+      "device_id": "greenhouse_node_1",
+      "timestamp": "2026-04-25T12:57:46.182000"
+    },
+    {
+      "sensor": "co2_value",
+      "value": 2036.0,
+      "severity": "critical",
+      "message": "CO\u2082 critically high",
+      "icon": "\ud83d\udca8",
+      "device_id": "greenhouse_node_1",
+      "timestamp": "2026-04-25T12:56:55.708000"
+    },
+    {
+      "sensor": "co2_value",
+      "value": 1756.0,
+      "severity": "critical",
+      "message": "CO\u2082 critically high",
+      "icon": "\ud83d\udca8",
+      "device_id": "greenhouse_node_1",
+      "timestamp": "2026-04-25T12:51:54.375000"
+    },
+    {
+      "sensor": "soil_moisture_percentage",
+      "value": 7.0,
+      "severity": "critical",
+      "message": "Soil critically dry \u2014 irrigation needed",
+      "icon": "\ud83e\udeb4",
+      "device_id": "greenhouse_node_1",
+      "timestamp": "2026-04-25T12:51:54.375000"
     },
     {
       "sensor": "soil_moisture_percentage",
@@ -46,6 +91,33 @@
       "icon": "\ud83c\udf21\ufe0f",
       "device_id": "greenhouse_node_1",
       "timestamp": "2026-04-25T11:29:44.706000"
+    },
+    {
+      "sensor": "co2_value",
+      "value": 1274.0,
+      "severity": "critical",
+      "message": "CO\u2082 critically high \u2014 open vents",
+      "icon": "\ud83d\udca8",
+      "device_id": "greenhouse_node_1",
+      "timestamp": "2026-04-25T11:29:44.706000"
+    },
+    {
+      "sensor": "temperature",
+      "value": 31.8,
+      "severity": "warning",
+      "message": "Temperature above safe range",
+      "icon": "\ud83c\udf21\ufe0f",
+      "device_id": "greenhouse_node_1",
+      "timestamp": "2026-04-25T11:24:40.753000"
+    },
+    {
+      "sensor": "soil_moisture_percentage",
+      "value": 11.0,
+      "severity": "critical",
+      "message": "Soil critically dry \u2014 irrigation needed",
+      "icon": "\ud83e\udeb4",
+      "device_id": "greenhouse_node_1",
+      "timestamp": "2026-04-25T11:24:40.753000"
     },
     {
       "sensor": "co2_value",
@@ -57,22 +129,13 @@
       "timestamp": "2026-04-25T11:24:40.753000"
     },
     {
-      "sensor": "soil_moisture_percentage",
-      "value": 11.0,
-      "severity": "critical",
-      "message": "Soil critically dry \u2014 irrigation needed",
-      "icon": "\ud83e\udeb4",
-      "device_id": "greenhouse_node_1",
-      "timestamp": "2026-04-25T11:24:40.753000"
-    },
-    {
       "sensor": "temperature",
       "value": 31.8,
       "severity": "warning",
       "message": "Temperature above safe range",
       "icon": "\ud83c\udf21\ufe0f",
       "device_id": "greenhouse_node_1",
-      "timestamp": "2026-04-25T11:24:40.753000"
+      "timestamp": "2026-04-25T11:19:37.653000"
     },
     {
       "sensor": "light_value",
@@ -84,15 +147,6 @@
       "timestamp": "2026-04-25T11:19:37.653000"
     },
     {
-      "sensor": "co2_value",
-      "value": 2108.0,
-      "severity": "critical",
-      "message": "CO\u2082 critically high \u2014 open vents",
-      "icon": "\ud83d\udca8",
-      "device_id": "greenhouse_node_1",
-      "timestamp": "2026-04-25T11:19:37.653000"
-    },
-    {
       "sensor": "soil_moisture_percentage",
       "value": 11.0,
       "severity": "critical",
@@ -102,11 +156,11 @@
       "timestamp": "2026-04-25T11:19:37.653000"
     },
     {
-      "sensor": "temperature",
-      "value": 31.8,
-      "severity": "warning",
-      "message": "Temperature above safe range",
-      "icon": "\ud83c\udf21\ufe0f",
+      "sensor": "co2_value",
+      "value": 2108.0,
+      "severity": "critical",
+      "message": "CO\u2082 critically high \u2014 open vents",
+      "icon": "\ud83d\udca8",
       "device_id": "greenhouse_node_1",
       "timestamp": "2026-04-25T11:19:37.653000"
     },
@@ -201,6 +255,15 @@
       "timestamp": "2026-04-25T10:57:50.971000"
     },
     {
+      "sensor": "temperature",
+      "value": 31.8,
+      "severity": "warning",
+      "message": "Temperature above safe range",
+      "icon": "\ud83c\udf21\ufe0f",
+      "device_id": "greenhouse_node_1",
+      "timestamp": "2026-04-25T10:57:41.994000"
+    },
+    {
       "sensor": "soil_moisture_percentage",
       "value": 0.0,
       "severity": "critical",
@@ -211,12 +274,21 @@
     },
     {
       "sensor": "temperature",
-      "value": 31.8,
-      "severity": "warning",
-      "message": "Temperature above safe range",
+      "value": 35.6,
+      "severity": "critical",
+      "message": "Temperature critically high",
       "icon": "\ud83c\udf21\ufe0f",
       "device_id": "greenhouse_node_1",
-      "timestamp": "2026-04-25T10:57:41.994000"
+      "timestamp": "2026-04-25T06:54:26.245000"
+    },
+    {
+      "sensor": "soil_moisture_percentage",
+      "value": 0.0,
+      "severity": "critical",
+      "message": "Soil critically dry \u2014 irrigation needed",
+      "icon": "\ud83e\udeb4",
+      "device_id": "greenhouse_node_1",
+      "timestamp": "2026-04-25T06:54:26.245000"
     },
     {
       "sensor": "co2_value",
@@ -228,22 +300,22 @@
       "timestamp": "2026-04-25T06:54:26.245000"
     },
     {
-      "sensor": "soil_moisture_percentage",
-      "value": 0.0,
-      "severity": "critical",
-      "message": "Soil critically dry \u2014 irrigation needed",
-      "icon": "\ud83e\udeb4",
-      "device_id": "greenhouse_node_1",
-      "timestamp": "2026-04-25T06:54:26.245000"
-    },
-    {
       "sensor": "temperature",
       "value": 35.6,
       "severity": "critical",
       "message": "Temperature critically high",
       "icon": "\ud83c\udf21\ufe0f",
       "device_id": "greenhouse_node_1",
-      "timestamp": "2026-04-25T06:54:26.245000"
+      "timestamp": "2026-04-25T06:49:23.902000"
+    },
+    {
+      "sensor": "soil_moisture_percentage",
+      "value": 0.0,
+      "severity": "critical",
+      "message": "Soil critically dry \u2014 irrigation needed",
+      "icon": "\ud83e\udeb4",
+      "device_id": "greenhouse_node_1",
+      "timestamp": "2026-04-25T06:49:23.902000"
     },
     {
       "sensor": "co2_value",
@@ -255,24 +327,6 @@
       "timestamp": "2026-04-25T06:49:23.902000"
     },
     {
-      "sensor": "soil_moisture_percentage",
-      "value": 0.0,
-      "severity": "critical",
-      "message": "Soil critically dry \u2014 irrigation needed",
-      "icon": "\ud83e\udeb4",
-      "device_id": "greenhouse_node_1",
-      "timestamp": "2026-04-25T06:49:23.902000"
-    },
-    {
-      "sensor": "temperature",
-      "value": 35.6,
-      "severity": "critical",
-      "message": "Temperature critically high",
-      "icon": "\ud83c\udf21\ufe0f",
-      "device_id": "greenhouse_node_1",
-      "timestamp": "2026-04-25T06:49:23.902000"
-    },
-    {
       "sensor": "co2_value",
       "value": 1524.0,
       "severity": "critical",
@@ -280,6 +334,15 @@
       "icon": "\ud83d\udca8",
       "device_id": "greenhouse_node_1",
       "timestamp": "2026-04-25T06:42:56.874000"
+    },
+    {
+      "sensor": "temperature",
+      "value": 35.2,
+      "severity": "critical",
+      "message": "Temperature critically high",
+      "icon": "\ud83c\udf21\ufe0f",
+      "device_id": "greenhouse_node_1",
+      "timestamp": "2026-04-25T06:42:51.502000"
     },
     {
       "sensor": "co2_value",
@@ -297,15 +360,6 @@
       "message": "Temperature critically high",
       "icon": "\ud83c\udf21\ufe0f",
       "device_id": "greenhouse_node_1",
-      "timestamp": "2026-04-25T06:42:51.502000"
-    },
-    {
-      "sensor": "co2_value",
-      "value": 1522.0,
-      "severity": "critical",
-      "message": "CO\u2082 critically high \u2014 open vents",
-      "icon": "\ud83d\udca8",
-      "device_id": "greenhouse_node_1",
       "timestamp": "2026-04-25T06:42:46.180000"
     },
     {
@@ -318,11 +372,11 @@
       "timestamp": "2026-04-25T06:42:46.180000"
     },
     {
-      "sensor": "temperature",
-      "value": 35.2,
+      "sensor": "co2_value",
+      "value": 1522.0,
       "severity": "critical",
-      "message": "Temperature critically high",
-      "icon": "\ud83c\udf21\ufe0f",
+      "message": "CO\u2082 critically high \u2014 open vents",
+      "icon": "\ud83d\udca8",
       "device_id": "greenhouse_node_1",
       "timestamp": "2026-04-25T06:42:46.180000"
     },
@@ -363,6 +417,15 @@
       "timestamp": "2026-04-25T06:42:35.734000"
     },
     {
+      "sensor": "temperature",
+      "value": 35.2,
+      "severity": "critical",
+      "message": "Temperature critically high",
+      "icon": "\ud83c\udf21\ufe0f",
+      "device_id": "greenhouse_node_1",
+      "timestamp": "2026-04-25T06:42:30.246000"
+    },
+    {
       "sensor": "co2_value",
       "value": 1935.0,
       "severity": "critical",
@@ -372,13 +435,13 @@
       "timestamp": "2026-04-25T06:42:30.246000"
     },
     {
-      "sensor": "temperature",
-      "value": 35.2,
+      "sensor": "soil_moisture_percentage",
+      "value": 0.0,
       "severity": "critical",
-      "message": "Temperature critically high",
-      "icon": "\ud83c\udf21\ufe0f",
+      "message": "Soil critically dry \u2014 irrigation needed",
+      "icon": "\ud83e\udeb4",
       "device_id": "greenhouse_node_1",
-      "timestamp": "2026-04-25T06:42:30.246000"
+      "timestamp": "2026-04-25T06:42:24.938000"
     },
     {
       "sensor": "co2_value",
@@ -396,7 +459,7 @@
       "message": "Soil critically dry \u2014 irrigation needed",
       "icon": "\ud83e\udeb4",
       "device_id": "greenhouse_node_1",
-      "timestamp": "2026-04-25T06:42:24.938000"
+      "timestamp": "2026-04-25T06:37:24.902000"
     },
     {
       "sensor": "temperature",
@@ -406,28 +469,10 @@
       "icon": "\ud83c\udf21\ufe0f",
       "device_id": "greenhouse_node_1",
       "timestamp": "2026-04-25T06:37:24.902000"
-    },
-    {
-      "sensor": "co2_value",
-      "value": 2155.0,
-      "severity": "critical",
-      "message": "CO\u2082 critically high \u2014 open vents",
-      "icon": "\ud83d\udca8",
-      "device_id": "greenhouse_node_1",
-      "timestamp": "2026-04-25T06:37:24.902000"
-    },
-    {
-      "sensor": "soil_moisture_percentage",
-      "value": 0.0,
-      "severity": "critical",
-      "message": "Soil critically dry \u2014 irrigation needed",
-      "icon": "\ud83e\udeb4",
-      "device_id": "greenhouse_node_1",
-      "timestamp": "2026-04-25T06:37:24.902000"
     }
   ],
   "alert_summary": {
-    "critical": 34,
+    "critical": 40,
     "warning": 11
   }
 }

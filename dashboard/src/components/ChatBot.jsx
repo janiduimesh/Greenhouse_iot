@@ -135,7 +135,7 @@ export default function ChatBot() {
               <span style={styles.headerIcon}>🌿</span>
               <div>
                 <div style={styles.headerTitle}>Greenhouse Assistant</div>
-                <div style={styles.headerSub}>Powered by Gemini AI</div>
+                <div style={styles.headerSub}>Powered by groq AI</div>
               </div>
             </div>
             <button onClick={() => setOpen(false)} style={styles.closeBtn} id="chatbot-close-btn">✕</button>
