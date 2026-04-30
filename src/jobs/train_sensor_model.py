@@ -16,9 +16,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import TimeSeriesSplit
 
 
-# =========================================================
-# LOGGING
-# =========================================================
+
 LOG_DIR = Path(__file__).parent.parent / "logs"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -33,9 +31,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-# =========================================================
-# CONFIG
-# =========================================================
 MODEL_DIR = Path(__file__).parent.parent / "model" / "greenhouse"
 MODEL_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -65,9 +60,7 @@ SENSOR_COLUMNS = [
 LAG_STEPS = [1, 2, 3, 6, 12, 24]
 
 
-# =========================================================
-# SETTINGS
-# =========================================================
+
 async def get_settings():
     """
     Adjust this import to match your project.
@@ -79,9 +72,7 @@ async def get_settings():
     return _get_settings()
 
 
-# =========================================================
-# DATA FETCH
-# =========================================================
+
 async def fetch_training_data(settings, device_id: str) -> List[dict]:
     """
     Fetch historical greenhouse data from MongoDB for one device.
