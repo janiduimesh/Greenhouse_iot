@@ -21,11 +21,7 @@ async def register(
     data: UserRegister,
     current_user: dict = None,
 ):
-    """
-    Register a new user.
-    - First user ever: auto-becomes admin, no auth required.
-    - After that: only admins can register new users.
-    """
+    
     db = get_database()
     users = db["users"]
 
@@ -99,11 +95,7 @@ async def register_user(
     data: UserRegister,
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(optional_security),
 ):
-    """
-    Register a new user.
-    - First user: auto-becomes admin, no auth needed.
-    - After that: requires admin JWT.
-    """
+    
     db = get_database()
     users = db["users"]
 
