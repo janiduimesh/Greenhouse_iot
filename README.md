@@ -87,23 +87,28 @@ The dashboard uses **mock data** only. When the IoT server is ready, replace the
 ```
 Greenhouse_iot/
 ├── src/                    # FastAPI backend
-│   ├── app.py
-│   ├── routes/
-│   ├── schema/
-│   ├── services/
-│   ├── utils/
-│   └── jobs/
+│   ├── app.py              # Main application entry point
+│   ├── routes/             # API Endpoints (Auth, Sensor Data, Alerts, Chat, etc.)
+│   ├── schema/             # Pydantic validation models
+│   ├── jobs/               # Background tasks (ML retraining, Data snapshot)
+│   ├── model/              # Saved Random Forest models
+│   ├── data/               # Snapshot JSON data for AI Chatbot
+│   ├── logs/               # Application and training logs
+│   ├── services/           # Business logic services
+│   ├── utils/              # Database connection, Config
+│   └── requirements.txt    # Python dependencies
 ├── dashboard/              # React frontend (Smart Greenhouse Monitoring Dashboard)
 │   ├── src/
-│   │   ├── components/      # Header, DashboardCard, charts, AlertList, DeviceStatus
-│   │   ├── pages/          # Dashboard, History, Settings, Reports
-│   │   ├── data/           # mockReadings.js (replace with API later)
-│   │   ├── App.jsx
-│   │   └── main.jsx
+│   │   ├── api/            # API client configurations
+│   │   ├── components/     # ChatBot, Header, Charts, ProtectedRoute, etc.
+│   │   ├── context/        # React context (AuthContext)
+│   │   ├── pages/          # Dashboard, Analytics, Forecast, History, Reports, Settings, Login, Register
+│   │   ├── data/           # Static constants and configurations
+│   │   ├── App.jsx         # Main router and layout
+│   │   └── main.jsx        # React DOM entry
 │   ├── index.html
 │   └── package.json
-├── requirements.txt
-├── .env                    # Optional; not committed
+├── .env                    # Environment variables (not committed)
 ├── .gitignore
 └── README.md
 ```
